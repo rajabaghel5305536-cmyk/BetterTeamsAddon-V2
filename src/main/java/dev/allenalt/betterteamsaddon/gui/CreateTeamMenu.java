@@ -1,54 +1,85 @@
 package dev.allenalt.betterteamsaddon.gui;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.Listener;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.ChatColor;
+
+import dev.allenalt.betterteamsaddon.BetterTeamsAddon;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class CreateTeamMenu implements Listener {
 
-    public static void open(Player player) {
-        Inventory inv = Bukkit.createInventory(null, 27, ChatColor.GOLD + "Customize Your Team");
+    private final BetterTeamsAddon plugin;
 
-        inv.setItem(11, createItem(Material.WHITE_BANNER, "&aSet Team Banner"));
-        inv.setItem(13, createItem(Material.NAME_TAG, "&bEdit Team Name"));
-        inv.setItem(15, createItem(Material.PAINTING, "&eSet Team Icon"));
+    public CreateTeamMenu(BetterTeamsAddon plugin) {
+        this.plugin = plugin;
+        Bukkit.getPluginManager().registerEvents(this, plugin);
+    }
+
+    public static void open(Player player) {
+        BetterTeamsAddon plugin = BetterTeamsAddon.getInstance();
+        ConfigurationSection menu = plugin.getConfig().getConfigurationSection("menu");
+
+        String title = ChatColor.translateAlternateColorCodes('&', menu.getString("title", "&6Create Team"));
+        int size = menu.getInt("size", 27);
+        Inventory inv = Bukkit.createInventory(null, size, title);
+
+        ConfigurationSection items = menu.getConfigurationSection("items");
+        if (items != null) {
+            for (String key : items.getKeys(false)) {
+                int slot = Integer.parseInt(key);
+                ConfigurationSection itemSec = items.getConfigurationSection(key);
+                if (itemSec == null) continue;
+
+                Material mat = Material.matchMaterial(itemSec.getString("material", "STONE"));
+                if (mat == null) mat = Material.STONE;
+
+                ItemStack item = new ItemStack(mat);
+                ItemMeta meta = item.getItemMeta();
+                if (meta != null) {
+                    meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', itemSec.getString("name", "&7Item")));
+                    List<String> lore = new ArrayList<>();
+                    for (String line : itemSec.getStringList("lore")) {
+                        lore.add(ChatColor.translateAlternateColorCodes('&', line));
+                    }
+                    meta.setLore(lore);
+                    item.setItemMeta(meta);
+                }
+                inv.setItem(slot, item);
+            }
+        }
 
         player.openInventory(inv);
     }
 
-    private static ItemStack createItem(Material mat, String name) {
-        ItemStack item = new ItemStack(mat);
-        ItemMeta meta = item.getItemMeta();
-        meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', name));
-        item.setItemMeta(meta);
-        return item;
-    }
-
     @EventHandler
     public void onClick(InventoryClickEvent e) {
-        if (e.getView().getTitle().equals(ChatColor.GOLD + "Customize Your Team")) {
-            e.setCancelled(true);
+        if (e.getView().getTitle().contains("Create")) {
+            e.setCancelled(true); // Prevent taking items
             Player player = (Player) e.getWhoClicked();
+            int slot = e.getRawSlot();
 
-            switch (e.getSlot()) {
-                case 11:
-                    player.sendMessage(ChatColor.GREEN + "Team Banner customization coming soon!");
-                    break;
-                case 13:
-                    player.sendMessage(ChatColor.AQUA + "Team Name editing feature coming soon!");
-                    break;
-                case 15:
-                    player.sendMessage(ChatColor.YELLOW + "Team Icon customization coming soon!");
-                    break;
-                default:
-                    break;
+            // Example: close menu if player clicks "Cancel"
+            String itemName = e.getCurrentItem() != null && e.getCurrentItem().hasItemMeta()
+                    ? ChatColor.stripColor(e.getCurrentItem().getItemMeta().getDisplayName())
+                    : "";
+
+            if (itemName.equalsIgnoreCase("Cancel")) {
+                player.closeInventory();
+                player.sendMessage(ChatColor.RED + "Menu closed.");
+            } else {
+                player.sendMessage(ChatColor.GREEN + "You clicked: " + itemName);
             }
         }
     }
