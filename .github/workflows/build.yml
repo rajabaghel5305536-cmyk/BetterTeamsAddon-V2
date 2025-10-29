@@ -12,18 +12,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout the repository
-      - name: Checkout source
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Step 2: Set up Java (Paper/Spigot 1.21 uses Java 21)
       - name: Set up Java 21
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 21
 
-      # Step 3: Cache Maven dependencies
       - name: Cache Maven packages
         uses: actions/cache@v4
         with:
@@ -32,12 +29,14 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
 
-      # Step 4: Build the plugin
+      # ✅ Install BetterTeams locally
+      - name: Install BetterTeams dependency
+        run: mvn install:install-file -Dfile=libs/BetterTeams-4.15.2.jar -DgroupId=com.booksaw.betterTeams -DartifactId=BetterTeams -Dversion=4.15.2 -Dpackaging=jar
+
       - name: Build with Maven
         run: mvn -B clean package
 
-      # Step 5: Upload compiled .jar as artifact
-      - name: Upload plugin artifact
+      - name: Upload plugin JAR
         uses: actions/upload-artifact@v4
         with:
           name: BetterTeamsAddon
