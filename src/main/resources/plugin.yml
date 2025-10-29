@@ -1,0 +1,7 @@
+name: BetterTeamsAddon
+version: 1.0.0
+main: dev.allenalt.betterteamsaddon.BetterTeamsAddon
+api-version: 1.21
+depend: [BetterTeams]
+author: Dev_Allenalt_tw
+description: Opens a custom menu when a player creates a team with BetterTeams.
