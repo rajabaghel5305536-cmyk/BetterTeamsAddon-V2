@@ -2,13 +2,12 @@ package dev.allenalt.betterteamsaddon.listeners;
 
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.entity.Player;
 import org.bukkit.Bukkit;
 
-import com.booksaw.betterTeams.event.TeamCreateEvent; // ✅ correct import for v4.15.2
-
-import dev.allenalt.betterteamsaddon.gui.CreateTeamMenu;
 import dev.allenalt.betterteamsaddon.BetterTeamsAddon;
+import dev.allenalt.betterteamsaddon.gui.CreateTeamMenu;
 
 public class TeamCreateListener implements Listener {
 
@@ -19,13 +18,18 @@ public class TeamCreateListener implements Listener {
     }
 
     @EventHandler
-    public void onTeamCreate(TeamCreateEvent event) {
+    public void onTeamCreateCommand(PlayerCommandPreprocessEvent event) {
         Player player = event.getPlayer();
-        if (player == null) return;
+        String message = event.getMessage().toLowerCase();
 
-        // Open custom menu 1 tick later to ensure team creation completes
-        Bukkit.getScheduler().runTaskLater(plugin, () -> {
-            CreateTeamMenu.open(player);
-        }, 1L);
+        // Detect "/team create <name>" or "/t create <name>"
+        if (message.startsWith("/team create") || message.startsWith("/t create")) {
+            // Run the GUI a few ticks later (after BetterTeams processes the command)
+            Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                if (player.isOnline()) {
+                    CreateTeamMenu.open(player);
+                }
+            }, 20L); // delay ~1 second to ensure team exists
+        }
     }
 }
