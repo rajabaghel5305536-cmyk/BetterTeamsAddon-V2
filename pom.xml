@@ -12,16 +12,10 @@
     <description>Addon for BetterTeams — opens a custom GUI when creating teams.</description>
 
     <repositories>
-        <!-- Spigot API repo -->
+        <!-- SpigotMC repo for API -->
         <repository>
             <id>spigot-repo</id>
             <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
-        </repository>
-
-        <!-- PaperMC repo (optional) -->
-        <repository>
-            <id>papermc</id>
-            <url>https://repo.papermc.io/repository/maven-public/</url>
         </repository>
     </repositories>
 
@@ -34,7 +28,7 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- BetterTeams (local install) -->
+        <!-- BetterTeams (installed manually from libs/) -->
         <dependency>
             <groupId>com.booksaw.betterTeams</groupId>
             <artifactId>BetterTeams</artifactId>
