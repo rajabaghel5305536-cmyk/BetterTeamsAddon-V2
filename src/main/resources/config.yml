@@ -1,0 +1,19 @@
+menu:
+  title: "&6Create Your Team"
+  size: 27
+  items:
+    11:
+      material: DIAMOND_SWORD
+      name: "&aTeam Icon"
+      lore:
+        - "&7Click to set your team icon!"
+    13:
+      material: PAPER
+      name: "&eTeam Description"
+      lore:
+        - "&7Add a custom description for your team."
+    15:
+      material: BARRIER
+      name: "&cCancel"
+      lore:
+        - "&7Close this menu."
