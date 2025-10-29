@@ -5,7 +5,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.entity.Player;
 import org.bukkit.Bukkit;
 
-import com.booksaw.betterTeams.events.TeamCreateEvent;
+import com.booksaw.betterTeams.event.TeamCreateEvent; // ✅ correct import for v4.15.2
 
 import dev.allenalt.betterteamsaddon.gui.CreateTeamMenu;
 import dev.allenalt.betterteamsaddon.BetterTeamsAddon;
@@ -23,7 +23,7 @@ public class TeamCreateListener implements Listener {
         Player player = event.getPlayer();
         if (player == null) return;
 
-        // Delay to ensure team creation completes
+        // Open custom menu 1 tick later to ensure team creation completes
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
             CreateTeamMenu.open(player);
         }, 1L);
